@@ -143,7 +143,8 @@ module.exports = function (grunt) {
                 expand: true,     // Enable dynamic expansion.
                 cwd: "app/public/js/",      // Src matches are relative to this path.
                 src: ["**/*.js"], // Actual pattern(s) to match.
-                dest: "build/",   // Destination path prefix.
+                // --> python_sockets_node_io/app/app/public/js/min
+                dest: "app/public/js/min/",   // Destination path prefix.
                 ext: ".min.js",   // Dest filepaths will have this extension.
                 extDot: "first"   // Extensions in filenames begin after the first dot
               }
@@ -158,8 +159,8 @@ module.exports = function (grunt) {
             livereload: true
         },
         html: { //The watch task can run a unique set of tasks according to the file being saved, using targets
-          files: ['index.html'],
-          tasks: ['htmlhint']
+          files: ["index.html"],
+          tasks: ["htmlhint"]
         },
         scripts: {
             files: [

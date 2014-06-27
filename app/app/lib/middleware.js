@@ -29,4 +29,7 @@ module.exports = function (app) {
     app.use(error_middleware);
 
     var io = require('socket.io').listen(app.listen());
+
+    //asasa
+    var x="ho";
 };

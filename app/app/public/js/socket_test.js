@@ -1,6 +1,5 @@
 // Establish the connection with the server
 
-var x ="test grunt file ";
 //sockethandler
 if (typeof sockethandler == 'undefined') { var sockethandler = {}; }
 
@@ -26,6 +25,10 @@ $(function() {
 });
 
 var socket = io.connect(document.location.href);
+
+/*
+Esto no debe aparecer
+*/
 
 
 
