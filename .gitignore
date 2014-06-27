@@ -1,0 +1,22 @@
+#my test code not clean
+client.html
+io-client.py
+server.js
+
+bin
+build/*
+!build/build.xml
+logs_dev
+doc
+dest
+
+
+#
+node_modules
+
+
+
+bower_components
+
+#
+sockets
