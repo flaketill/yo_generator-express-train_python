@@ -3,8 +3,14 @@
 
 //var module = require('moment');
 
+//Detect os 
+//var os  = require("os");
+//var platform = os.platform();
+//var windows = platform.indexOf("win") === 0;
+//var linux = platform === "linux";
+
 var LIVERELOAD_PORT = 35729;
-var RUNNING_PORT = 1337; // <- if you change this, you need to change in public/js/app.js and recompile
+var RUNNING_PORT = 3001; // <- if you change this, you need to change in app/config/default.json app/views/partitials/scripts.hbs ap/public/js/socket_test.js
 var lrSnippet = require("connect-livereload")({port: LIVERELOAD_PORT});
 var mountFolder = function (connect, dir) {
   return connect.static(require("path").resolve(dir));
@@ -78,29 +84,33 @@ module.exports = function (grunt) {
     },
 
     concat: {
-      options: {
+      options: 
+      {
         separator: ";",
         stripBanners:true
       },
-      dist: {
+      dist: 
+      {
         src: ["app/public/js/app.js"],
         dest: "app/public/js/concat.js",
       },
-
-      foo: {
-      files: {
-        "dest/a.js": ["src/aa.js", "src/aaa.js"],
-        "dest/a1.js": ["src/aa1.js", "src/aaa1.js"],
+      foo: 
+      {
+        files: 
+        {
+          "dest/a.js": ["src/aa.js", "src/aaa.js"],
+          "dest/a1.js": ["src/aa1.js", "src/aaa1.js"]
+        }
       },
-      },
-      bar: {
-        files: {
+      bar: 
+      {
+        files: 
+        {
           "dest/b.js": ["src/bb.js", "src/bbb.js"],
-          "dest/b1.js": ["src/bb1.js", "src/bbb1.js"],
-        },
-      },    
+          "dest/b1.js": ["src/bb1.js", "src/bbb1.js"]
+        }
+      }  
     },
-
     //this is currently turned off, since jquery KILLS it 
     jshint: {
       options: {
@@ -133,28 +143,30 @@ module.exports = function (grunt) {
           "app/public/js/app.min.js": ["app/public/js/concat.js"]
         }
       },
-      dynamic_mappings: {
-      // Grunt will search for "**/*.js" under "lib/" when the "uglify" task
-      // runs and build the appropriate src-dest file mappings then, so you
-      // don't need to update the Gruntfile when files are added or removed.
-      files: 
-            [
-              {
-                expand: true,     // Enable dynamic expansion.
-                cwd: "app/public/js/",      // Src matches are relative to this path.
-                src: ["**/*.js"], // Actual pattern(s) to match.
-                // --> python_sockets_node_io/app/app/public/js/min
-                dest: "app/public/js/min/",   // Destination path prefix.
-                ext: ".min.js",   // Dest filepaths will have this extension.
-                extDot: "first"   // Extensions in filenames begin after the first dot
-              }
-            ],
-      },
+      dynamic_mappings: 
+      {
+        // Grunt will search for "**/*.js" under "lib/" when the "uglify" task
+        // runs and build the appropriate src-dest file mappings then, so you
+        // don't need to update the Gruntfile when files are added or removed.
+        files: 
+              [
+                {
+                  expand: true,     // Enable dynamic expansion.
+                  cwd: "app/public/js/",      // Src matches are relative to this path.
+                  src: ["**/*.js", "!**/slidebars.min.js","!**/jquery.min.js"], // Actual pattern(s) to match.
+                  // --> python_sockets_node_io/app/app/public/js/min
+                  dest: "app/public/js/min/",   // Destination path prefix.
+                  ext: ".min.js",   // Dest filepaths will have this extension.
+                  extDot: "first"   // Extensions in filenames begin after the first dot
+                  //Paths matching patterns that begin with ! will be excluded from the returned array --> EG: '!docroot/js/main.min.js'
+                  // '!**/ie/*'  -- '!**/iecompat.js'
+                }
+              ]
+        }
     },
     // Watch Config
-    watch: {
-        //files: ["app/views/**/*", "app/styles/**/*", "vendor/**/*", "public/img/**/*", "app/client/**/*"],
-        files: ["views/**/*", "models/**/*"],
+    watch: {      
+        files: ["models/**/*","views/**/*","controllers/**/*","public/**/*"],
         options: {
             livereload: true
         },
@@ -205,7 +217,7 @@ module.exports = function (grunt) {
      nodemon:{
       dev: {
         options: {
-          file: "server.js",
+          file: "app.js",
           //args: ['dev'],
           //nodeArgs: ['--debug'],
           ignoredFiles: ["node_modules/**"],
@@ -231,7 +243,7 @@ module.exports = function (grunt) {
     // run 'watch' indefinitely, together
     concurrent: {
         target: {
-            tasks: ["nodemon", "watch"],
+            tasks: ["nodemon", "watch","launch"],
             options: {
                 logConcurrentOutput: true
             }
@@ -281,14 +293,12 @@ module.exports = function (grunt) {
   //grunt.loadNpmTasks("grunt-contrib-watch");
   //grunt.loadNpmTasks("grunt-reload");
 
-  grunt.registerTask("default", ["reload", "watch"]);
+  //grunt.registerTask("styles", [ "sass"]); //TO evit warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
 
-  grunt.registerTask("styles", [ "sass"]); //TO evit warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.
-
+//task.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
+  grunt.registerTask("default", ["build", "concurrent"]);
   grunt.registerTask("build", ["cssmin", "concat", "uglify"]);
-
   grunt.registerTask("launch", ["wait", "open"]);
 
-  grunt.registerTask("default", ["build", "concurrent"]);
 
 };

@@ -2,6 +2,8 @@
 client.html
 io-client.py
 server.js
+test.py
+tmp.js
 
 bin
 build/*
@@ -11,12 +13,15 @@ doc
 dest
 
 
-#
+#npm
 node_modules
-
-
-
+#bower
 bower_components
+
 
 #
 sockets
+socketio
+
+#logs
+*.log

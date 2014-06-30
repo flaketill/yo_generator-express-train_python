@@ -1,7 +1,34 @@
 {
-  "name": "erpmtics-express-train-socket",
-  "version": "0.0.1",
-  "dependencies": {
-    "bootstrap.css": "~2.3.2"
-  }
+  	"name": "erpmtics-express-train-socket",
+  	"description":"Test yo generator-express-train with sockets ",
+  	"author":
+  	{
+    	"name":"Ing. Armando Ibarra - armandoibarra1@gmail.com"
+    },
+  	"keywords": [
+        "css",
+        "grunt",
+        "express-train"
+  	],
+   	"bugs": {
+        "url": "https://github.com/flaketill/yo_generator-express-train_python/issues"
+    },
+    "homepage": "https://github.com/flaketill/yo_generator-express-train_python",
+    "licenses": [
+                    {
+                      "type": "GLPV3",
+                      "url": "https://raw.github.com/flaketill/yo_generator-express-train_python/master/LICENSE"
+                    }
+    ],
+    "readme": "[erpmtics-express-train-socket](https://github.com/flaketill/yo_generator-express-train_python/)",
+  	"version": "0.0.1",
+  	"dependencies": 
+  	{
+    	"bootstrap.css": "~3.0.3" //Not exist yet but i use v3.0.3 (manual)
+  	}
+  	,"ignore": 
+  	[
+	    "**/.*",
+	    "node_modules"
+  	]
 }

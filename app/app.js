@@ -1,6 +1,6 @@
-//Module dependencies.
-var path = require('path');
+/*jslint node: true */
+"use strict";
 
-app = require('./app/index.js');
+var app = require("./app/index.js");
 
 module.exports = app.resolve();
