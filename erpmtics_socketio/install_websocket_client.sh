@@ -20,6 +20,9 @@
 #----------------------------------------------------------------------
 # NOTES:    
 #----------------------------------------------------------------------
+#  	 You can use this script from git:
+# 	 curl -s https://raw.githubusercontent.com/flaketill/yo_generator-express-train_python/master/erpmtics_socketio/install_websocket_client.sh | sh
+# 	 curl -s https://raw.githubusercontent.com/flaketill/yo_generator-express-train_python/master/erpmtics_socketio/install_websocket_client.sh | bash
 
 #    Test on Archlinux
 #----------------------------------------------------------------------
@@ -72,7 +75,8 @@ THIS_SCRIPT_PATH=`readlink -f $0`
 THIS_SCRIPT_DIR=`dirname ${THIS_SCRIPT_PATH}`
 TMP_CONF=$HOME"/.erpmtics"
 
-PATH_DEB=$THIS_SCRIPT_DIR"/$DEB"
+#421
+PATH_PY_REQUERIMENTS=$THIS_SCRIPT_DIR"/requirements.txt"
 
 DEPENDENCIES_ARCH="none"
 DEPENDENCIES="sudo curl axel wget ssh yolk"
@@ -87,7 +91,9 @@ DEPS_PIP="YES"
 DISTROS_SUPPORT="Arch Ubuntu Debian"
 DISTRO="none"
 PACKAGE_MANAGER="none"
-MANAGER_SEARCH_PY_pkgs="none"
+MANAGER_SEARCH_PY_PKGS="none"
+
+NAME_PROYECT="$THIS_SCRIPT_DIR/test"
 
 ## make sure dir exits; else create it
 #[ -d ~/.config/erpmtics ] || mkdir -p ~/.config/erpmtics
@@ -196,28 +202,22 @@ manager_python_pkgs()
 	#i Use this because "Stop Trying to Reinvent the Wheel"
   	#Order to use, plese see more on: http://code.activestate.com/pypm/search:setuptools/
   	if check_pkg yolk; then
-  		MANAGER_SEARCH_PY_pkgs="yolk"
+  		MANAGER_SEARCH_PY_PKGS="yolk"
     	return 0
   	elif check_pkg pip2; then #WRNING with /usr/bin/vendor_perl/pip
     	#wget https: && return 0
     	#pip2 freeze
-    	show_msn_w "existe git"
+    	MANAGER_SEARCH_PY_PKGS="pip2"
     	return 0
 	elif check_pkg easy_install; then
-    	show_msn_w "existe easy_install"
+		MANAGER_SEARCH_PY_PKGS="easy_install"
+    	return 0
+    else
+    	MANAGER_SEARCH_PY_PKGS="manual"
     	return 0
   	fi
 
-  #if not exist show msn 
-  msn_unable_search_package
-  
 }
-
-manager_python_pkgs
-
-if check_pkg easy_install; then
-	show_msn_w "existe easy_install"   
-fi
 
 #yolk -l | grep "setuptools" 
 # [armando@localhost site-packages]$ yolk -l | grep "setuptools" 
@@ -240,10 +240,6 @@ fi
 # Descripción       : A high-level scripting language
 
 
-
-show_msn_w "$LINENO -- search package $1 with $MANAGER_SEARCH_PY_pkgs $RESET"    	
-exit 0
-
 #Like this:
 # [armando@localhost site-packages]$ yolk -l | grep "virtualenv" 
 # 	virtualenv-clone - 0.2.5        - active 
@@ -254,31 +250,56 @@ exit 0
 
 check_python_pkgs()
 {
-	#pip install -U yolk -U | awk '{print $1}'
-	#yolk -l | grep "setup" 
+	#search manager for querying python packages installed on your system.
+	manager_python_pkgs
+	
+	#show_msn_w "$LINENO --  search package $1 with $MANAGER_SEARCH_PY_PKGS $RESET"
 
-	#yolk2 -l | grep "virtualenv" | wc -l &>/dev/null
-	py_yolk=$(yolk2 -l | grep "virtualenv" | wc -l)  &>/dev/null
-
- 	if test $? -eq 0; then
- 		show_msn_w "$GREEN #############Dependences it's OK ############# $RESET"				            	
- 	else
- 		show_msn_w "$LINENO -- ERROR $RED I can't continue without dependences: $DEPENDENCIES $RESET"    			
- 	fi
-
- 	X="Ubuntu"
 	#manager python packages (search, install or others )
-	case "$X" in
+	case "$MANAGER_SEARCH_PY_PKGS" in
 	#case "$1" in
-  	'Arch') # Apply each step for arch linux
-			echo "Use yolk"
-  	;;
-  	'Ubuntu') # Apply each step for Ubuntu
-			show_msn_w "Other"
+  	'yolk')
+			show_msn_w "Plase wait, search with yolk .."
 
+			#pip install -U yolk -U | awk '{print $1}'
+			#yolk -l | grep "setup" 
+
+			#yolk2 -l | grep "virtualenv" | wc -l &>/dev/null
+			#for evit línea 256: yolk2: no se encontró la orden (for test error)
+
+			#py_yolk=$(yolk2 -l &>/dev/null | grep "virtualenv" | wc -l)---> always 0
+			#py_yolk=$(yolk -l | grep "virtualenv" | wc -l)
+			py_yolk=$(yolk -l | grep "$1" | wc -l)
+
+			if [ $py_yolk -eq 1 ]; then
+				show_msn_w "$GREEN #############Dependences it's OK ############# $RESET"
+				return 0
+		 	elif [ $py_yolk -gt 0 ]; then
+
+		 		show_msn_w "I found this packages:"
+		 		#search more specific
+		 		exec yolk -l | grep "$1" | awk '{print $1}'
+
+		 		return 1
+		 		#if seacrh versions - yolk -l | grep "$1" | awk '{print $3}'          	
+		 	else
+		 		show_msn_w "$LINENO -- ERROR $RED I can't found dependences: $1 $RESET"    			
+		 		return 1
+		 	fi
+  	;;
+  	'pip2')
+			show_msn_w "Plase wait, search with pip .."
+  	;;
+  	'easy_install')
+			show_msn_w "Plase wait, search with easy_install.."
+  	;;
+  	'manual')
+			show_msn_w "Plase wait, search manual .."
   	;;
  	*)
 		#Manual
+		#if not exist show msn 
+  		msn_unable_search_package
 		show_msn_w "$LINENO: Could not detect supported Linux distribution. Supported operating systems: $DISTROS_SUPPORT"
     	
   	;;
@@ -287,15 +308,262 @@ check_python_pkgs()
 
 search_python_pkgs()
 {
-	check_python_pkgs
-	show_msn_w "$LINENO -- search package $1 with $MANAGER_SEARCH_PY_pkgs $RESET"    			
+	check_python_pkgs $1 			
 }
 
+backup_virtualenvwrapper() 
+{
+    virtualenv_project="$1"
+    cp -p $HOME/$virtualenv_project $HOME/${virtualenv_project}.pre-virtualenv
+}
 
-manager_python_pkgs
-search_python_pkgs yolk
-search_python_pkgs virtualenv
-search_python_pkgs virtualenv2
+#search_python_pkgs virt
+#if search with name general like virt
+# [armando@localhost erpmtics_socketio]$ sh install_websocket_client.sh 
+#  Plase wait, search with yolk .. 
+#   #############Dependences it's OK #############  
+#  I found this packages: 
+# virtualenv-clone - 0.2.5        - active 
+# virtualenv      - 1.11.6       - active 
+# virtualenvwrapper - 4.3          - active 
+
+run_virtualenvwrapper()
+{
+	#/usr/lib/python2.7/site-packages/virtualenvwrapper
+
+	#https://docs.python.org/2/library/site.html
+	#https://docs.python.org/3/library/site.html
+	show_msn_w "Build virtualenv on $NAME_PROYECT"
+
+	#configure virtualenvwrapper
+	export VIRTUALENVWRAPPER_VIRTUALENV=virtualenv2
+	#source /usr/bin/virtualenvwrapper.sh
+
+	#Virtualenvwrapper
+	# export WORKON_HOME=$HOME/.virtualenvs
+	# export PROJECT_HOME=$HOME/Projects
+	# source /usr/bin/virtualenvwrapper.sh
+
+	export WORKON_HOME=$NAME_PROYECT/virtualenvs
+	export PROJECT_HOME=$NAME_PROYECT
+
+	export PIP_VIRTUALENV_BASE=$WORKON_HOME # Tell pip to create its virtualenvs in $WORKON_HOME.
+	export PIP_RESPECT_VIRTUALENV=true # Tell pip to automatically use the currently active virtualenv.
+
+	if [ ! -d $NAME_PROYECT ]; then
+		mkdir -p $NAME_PROYECT
+	fi
+
+	PYTHON=$(which python2 ) #&>/dev/null)
+
+	#if ! which $dep &>/dev/null;  then
+	if test $? -eq 0;then
+		show_msn_w "search python ..."
+		show_msn_w $PYTHON
+
+		PYTHON_SITE_PKG=$(python2 -sSc 'import site; print site.getsitepackages()[0]')
+
+		if test $? -eq 0;then
+			export VIRTUALENVWRAPPER_PYTHON=$PYTHON
+			#export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv2
+			#/usr/bin/virtualenv2
+			#exit 0
+		else
+			#python3 ?
+			
+			PYTHON3=$(which python3 )
+			if test $? -eq 0;then
+				show_msn_w "I found python v3"
+
+				PYTHON_SITE_PKG=$(python3 -m site --user-site)
+
+				if test $? -eq 0;then
+					show_msn_w "You use python3"
+					export VIRTUALENVWRAPPER_PYTHON=$PYTHON3
+					#export VIRTUALENVWRAPPER_VIRTUALENV=/usr/bin/virtualenv2
+					#/usr/bin/virtualenv2
+				fi
+			fi
+
+		fi
+
+		
+	fi
+
+	#Default Arguments for virtualenv
+	#~export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+	
+	if [ -e "/usr/bin/virtualenvwrapper.sh" ];then
+        show_msn_w "Found virtualenvwrapper.sh" >&2
+        #sh /usr/bin/virtualenvwrapper.sh
+
+        #Lazy Loading
+		#subl3 /usr/bin/virtualenvwrapper.sh
+		export VIRTUALENVWRAPPER_SCRIPT=/usr/bin/virtualenvwrapper.sh #/usr/bin/virtualenvwrapper.sh
+		
+		if [ -e "/usr/bin/virtualenvwrapper_lazy.sh" ];then
+			#reload the startup file
+			source /usr/bin/virtualenvwrapper_lazy.sh
+
+		elif [ -e "/usr/local/bin/virtualenvwrapper_lazy.sh" ];then
+			source /usr/local/bin/virtualenvwrapper_lazy.sh
+
+		else
+			source /usr/bin/virtualenvwrapper.sh
+		fi
+
+	else
+		show_msn_w "No"
+    fi
+
+	show_msn_w "-----------------Install some package on virtualenv -----------"
+
+	#echo 'pip install sphinx' >> $WORKON_HOME/postmkvirtualenv
+    #mkvirtualenv $NAME_PROYECT
+    #http://virtualenvwrapper.readthedocs.org/en/latest/command_ref.html
+    #mkvirtualenv [-a project_path] [-i package] [-r requirements_file] [virtualenv options] ENVNAME
+
+    if [ -d $NAME_PROYECT ]; then
+    	# associate an existing project directory with the new environment.
+
+    	#or backup
+		
+		if [ -f "PATH_PY_REQUERIMENTS" ];then
+			#specify a text file listing packages to be installed
+			show_msn_w "Build on exist project"
+			mkvirtualenv -a $NAME_PROYECT -r $PATH_PY_REQUERIMENTS
+			#like pip install -r requirements.txt
+		else
+			mkvirtualenv -a $NAME_PROYECT
+		fi
+
+	else
+
+		if [ -f "PATH_PY_REQUERIMENTS" ];then
+			#specify a text file listing packages to be installed
+			show_msn_w "Build on new project"
+			mkvirtualenv -r $PATH_PY_REQUERIMENTS tests 
+		
+		else
+			#install one or more packages after the environment is created.
+			mkvirtualenv tests -i 
+		fi
+	fi
+
+	exit 0
+
+	# mkvirtualenv --no-site-packages --distribute test_django
+	#mkvirtualenv -p python2 test
+    workon tests
+
+    show_msn_w "----------------------------"
+	echo $VIRTUAL_ENV
+	show_msn_w "----------------------------"
+	pip install sphinx
+	show_msn_w "----------------------------"
+	lssitepackages
+	show_msn_w "----------------------------"
+	pip list
+	show_msn_w "----------------------------"
+	workon
+	show_msn_w "----------------------------"
+	#plseas look http://virtualenvwrapper.readthedocs.org/en/latest/projects.html#project-management
+
+	#Automatically Run a Command after Environment Creation
+	#echo '[bash-command]' >> $WORKON_HOME/postactivate
+
+	#For Instance to Automatically Change to the New Env Directory:
+	#echo 'cd $VIRTUAL_ENV' >> $WORKON_HOME/postactivate
+
+	#To Automatically Installing Commonly Used Tools
+	#echo 'pip install [myGoodTool]' >> $WORKON_HOME/postmkvirtualenv
+	#echo 'pip install sphinx' >> $WORKON_HOME/postmkvirtualenv
+
+    show_msn_w "--------------------FINISH -----------No"
+
+	#stop working on it with:
+	deactivate
+    exit 0
+    #echo 'pip install yolk' >> $WORKON_HOME/
+
+    #if [ ! -f "/usr/bin/virtualenvwrapper.sh" ];then
+    #if [ -z "$1" ] 
+
+
+	
+
+	# VIRTUAL_ENV=$HOME/.virtualenv
+
+	# # Prepare isolated environment
+	# virtualenv $VIRTUAL_ENV
+
+	# # Activate isolated environment
+	# source $VIRTUAL_ENV/bin/activate
+
+	# # Install package
+	# pip install -U socketIO-client
+
+	export WORKON_HOME=$NAME_PROYECT
+	mkdir -p $WORKON_HOME
+	source /usr/bin/virtualenvwrapper.sh
+	mkvirtualenv $NAME_PROYECT
+
+	echo 'pip install yolk' >> $WORKON_HOME/
+
+	echo 'pip install sphinx' >> $WORKON_HOME/postmkvirtualenv
+#which sphinx-build
+# mkvirtualenv env2
+#workon env1
+#echo $VIRTUAL_ENV
+
+
+
+}
+
+run_virtualenv()
+{
+
+VIRTUAL_ENV="$NAME_PROYECT"
+export VIRTUAL_ENV
+
+_OLD_VIRTUAL_PATH="$PATH"
+PATH="$VIRTUAL_ENV/bin:$PATH"
+export PATH
+
+virtualenv2 --no-site-packages $NAME_PROYECT --verbose
+source $NAME_PROYECT/bin/activate  # on unix
+
+#source $NAME_PROYECT/scripts/activate     # on Windows
+}
+
+#Choose 
+if search_python_pkgs virtualenvwrapper; then
+    show_msn_w "Build env with virtualenvwrapper"
+    run_virtualenvwrapper
+
+elif search_python_pkgs virtualenv; then
+
+	show_msn_w "Build env with virtualenv2"
+	run_virtualenv
+fi	
+#pip install virtualenvwrapper
+
+#search_python_pkgs virtualenv2
+
+#install on arch linux
+#pacman -Sy python2-pip python2-virtualenv
+
+#ubuntu
+#sudo su -c "apt-get install virtualenvwrapper"
+
+#easy_install install pip
+
+#you can  use alias like
+#echo 'alias pip="/usr/bin/pip2"' >> $HOME/.bashrc
+exit 0
+
+
+
 
 
 exit 0
@@ -495,25 +763,8 @@ else
 	echo "n"
 fi
 
-cd "$srcdir"
 
-msg "Connecting to GIT server...."
-
-if [ -d $srcdir/$_gitname ]; then
-	cd $_gitname && git pull origin
-	msg "The local files are updated."
-else
-	git clone --depth=0 $_gitroot $_gitname
-	cd $_gitname
-fi
-
-msg "GIT checkout done or server timeout"
-_site_packages=$(python2 -sSc 'import site; print site.getsitepackages()[0]')
-install -Dm0644 docopt.py "$pkgdir$_site_packages/docopt.py"
-install -Dm0644 "LICENSE-MIT" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-
-
-if [ !d virtualenv ]; then
+if [ -d $srcdir/$_gitname virtualenv ]; then
 	#statements
 	echo -e "ok"
 fi
@@ -531,3 +782,15 @@ source $VIRTUAL_ENV/bin/activate
 
 # Install package
 pip install -U socketIO-client
+
+echo 'pip install sphinx' >> $WORKON_HOME/postmkvirtualenv
+#which sphinx-build
+# mkvirtualenv env2
+#workon env1
+#echo $VIRTUAL_ENV
+
+#Lazy Loading
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/Devel
+export VIRTUALENVWRAPPER_SCRIPT=/usr/local/bin/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper_lazy.sh
