@@ -50,10 +50,13 @@ module.exports = function(app, config) {
 		io.sockets.emit("msn", {msg:"connected"});
 
 		socket.on("msn", function(data, fn){
+
+			console.log("Server received datas from clients");
 			console.log(data);
 			io.sockets.emit("msn", {msg:data.msg});
+			//io.sockets.emit("msn", {msg:data});
 
-			fn();//call the client back to clear out the field
+			//call the client back to clear out the field
 		});
 
 	});
