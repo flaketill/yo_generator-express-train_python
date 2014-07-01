@@ -347,8 +347,8 @@ run_virtualenvwrapper()
 	export WORKON_HOME=$NAME_PROYECT/virtualenvs
 	export PROJECT_HOME=$NAME_PROYECT
 
-	export PIP_VIRTUALENV_BASE=$WORKON_HOME # Tell pip to create its virtualenvs in $WORKON_HOME.
-	export PIP_RESPECT_VIRTUALENV=true # Tell pip to automatically use the currently active virtualenv.
+	#export PIP_VIRTUALENV_BASE=$WORKON_HOME # Tell pip to create its virtualenvs in $WORKON_HOME.
+	#export PIP_RESPECT_VIRTUALENV=true # Tell pip to automatically use the currently active virtualenv.
 
 	if [ ! -d $NAME_PROYECT ]; then
 		mkdir -p $NAME_PROYECT
@@ -428,24 +428,27 @@ run_virtualenvwrapper()
 
     	#or backup
 		
-		if [ -f "PATH_PY_REQUERIMENTS" ];then
+		if [ -f "$PATH_PY_REQUERIMENTS" ];then
 			#specify a text file listing packages to be installed
 			show_msn_w "Build on exist project"
-			mkvirtualenv -a $NAME_PROYECT -r $PATH_PY_REQUERIMENTS
+			mkvirtualenv -a $NAME_PROYECT -r $PATH_PY_REQUERIMENTS tests
 			#like pip install -r requirements.txt
 		else
-			mkvirtualenv -a $NAME_PROYECT
+			show_msn_w "Build on exist project with requirements manual"
+			#mkvirtualenv -a $NAME_PROYECT
+			mkvirtualenv tests
 		fi
 
 	else
 
-		if [ -f "PATH_PY_REQUERIMENTS" ];then
+		if [ -f "$PATH_PY_REQUERIMENTS" ];then
 			#specify a text file listing packages to be installed
 			show_msn_w "Build on new project"
 			mkvirtualenv -r $PATH_PY_REQUERIMENTS tests 
 		
 		else
 			#install one or more packages after the environment is created.
+			show_msn_w "Build on exist project with -i"
 			mkvirtualenv tests -i 
 		fi
 	fi
