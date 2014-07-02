@@ -449,11 +449,9 @@ run_virtualenvwrapper()
 		else
 			#install one or more packages after the environment is created.
 			show_msn_w "Build on exist project with -i"
-			mkvirtualenv tests -i 
+			mkvirtualenv -i tests
 		fi
 	fi
-
-	exit 0
 
 	# mkvirtualenv --no-site-packages --distribute test_django
 	#mkvirtualenv -p python2 test
@@ -491,9 +489,6 @@ run_virtualenvwrapper()
 
     #if [ ! -f "/usr/bin/virtualenvwrapper.sh" ];then
     #if [ -z "$1" ] 
-
-
-	
 
 	# VIRTUAL_ENV=$HOME/.virtualenv
 

@@ -43,15 +43,23 @@ module.exports = function(app, config) {
 		console.log("Express server listening on port: " + app.get("port"));
 	});
 
+
+	var message =  function message (message) 
+	{
+        console.log("Server received datas from clients");
+    };
+
+
     var io = require("socket.io").listen(server);
 
     io.sockets.on("connection", function (socket) {
+	//INIT     	
 
-		io.sockets.emit("msn", {msg:"connected"});
+		socket.emit("welcome", {msg:"connected to server"});
 
-		socket.on("msn", function(data, fn){
+		socket.on("msn", function(data){ //, //fn){
 
-			console.log("Server received datas from clients");
+			console.log("63: Server received datas from clients");
 			console.log(data);
 			io.sockets.emit("msn", {msg:data.msg});
 			//io.sockets.emit("msn", {msg:data});
@@ -59,6 +67,20 @@ module.exports = function(app, config) {
 			//call the client back to clear out the field
 		});
 
+		// when the user disconnects.. perform this , this listens and executes
+		socket.on('disconnect', function() {
+
+			console.log("78: User disconnect to Server");
+		    
+		    // update list of users in chat, client-side
+		    //socket.emit('update_list',"SRE");
+		    //socket.emit("welcome", {msg:"Diconnected to server"});		    
+
+		    socket.broadcast.emit('update_list', 'User has disconnected');
+
+		});    
+	
+	//END
 	});
 
 

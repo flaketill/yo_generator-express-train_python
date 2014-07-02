@@ -4,6 +4,7 @@ io-client.py
 server2.js
 test.py
 tmp.js
+client_socket.py
 
 bin
 build/*
@@ -12,6 +13,13 @@ logs_dev
 doc
 dest
 
+# Python
+*~
+*.mo
+*.egg
+*.EGG
+*.egg-info
+*.EGG-INFO
 
 #npm
 node_modules
@@ -25,3 +33,12 @@ socketio
 
 #logs
 *.log
+
+#virtualenvs
+virtualenvs
+virtualenvs/*
+
+# Django
+*.log
+*.pot
+*.pyc
