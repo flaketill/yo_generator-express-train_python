@@ -47,7 +47,7 @@ import thread
 import time
 import sys
 from urllib import *
-
+import subprocess
 import asyncore
 import socket
 import struct
@@ -61,14 +61,16 @@ import simplejson as json
 
 #I'd like"Stop Reinventing The Wheel"
 #DON’T REINVENT THE WHEEL! USE A FRAMEWORK!
-from socketIO_client import SocketIO
+#from socketIO_client import SocketIO
+#from socketIO_client import SocketIO, BaseNamespace
 
 from time import sleep
 from datetime import datetime
 
 import httplib,logging
-from socketIO_client import SocketIO, BaseNamespace
 
+#from utils import os_type
+from utils import *
 
 # from erpmtics_socketio.config.settings import SOCKET_IO_HOST
 # from erpmtics_socketio.config.settings import SOCKET_IO_PORT
@@ -266,7 +268,24 @@ class SocketIOProvider(object):
             j += 1
  
         # Return the decoded string
-        return decodedChars        
+        return decodedChars
+
+    def test_command(self):
+        """Testing commands on win, linux and mac"""
+        try:
+            if os_type() =="linux":
+                logger.info("Run over Linux")
+                #open erpmtics_agent
+                command = 'erpmtics_agent'
+                subprocess.call(command)
+                
+            elif os_type() =="win":
+                logger.info("Win or cywin")
+            elif os_type() =="macosx":
+                logger.info("Mac OS X")
+                pass
+        except Exception, e:
+            logger.info("The following exception was expected:")
 
     def on_message(self, ws, message):
         #msg = json.loads(message)
@@ -296,10 +315,7 @@ class SocketIOProvider(object):
                 if m[9] == "update_app":
                     logger.info("Please wait, update apps")
                     #self.on("update")
-                    #open erpmtics_agent
-                    import subprocess
-                    command = 'erpmtics_agent'
-                    subprocess.call(command)
+                    self.test_command()
 
         return
 
