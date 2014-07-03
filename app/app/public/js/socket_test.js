@@ -23,6 +23,7 @@ var socket = io.connect(document.location.href);
 
 //setup some common vars (cache)
 var video = $('#video')
+    ,updates = $('h1')
     ,msn_test = "testing socket io python and node";//"armando";
 
     var message =  function message (message) 
@@ -34,7 +35,7 @@ var video = $('#video')
 
         console.log("Datas:" + data.msg);
 
-        $('#log').html("User connected");
+        $('#log').html("User connected");        
 
     });
 
@@ -76,7 +77,16 @@ var video = $('#video')
           console.log("Send datas");
         });
       
-    }); 
+    });
+
+    //Test clint send to server 
+    updates.click(function(e){
+
+        socket.emit("msn", {msg:"update_app"}, function(data){
+          console.log("Send datas");
+        });
+      
+    });  
 
 //when documento is ready
 $(document).ready(function() {
